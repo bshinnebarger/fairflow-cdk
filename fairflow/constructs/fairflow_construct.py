@@ -31,7 +31,7 @@ class FairflowConstruct(cdk.Construct):
         s3_logs_bucket = s3.Bucket(self, 'FairflowWorkerLogsS3Bucket',
             # comment these two lines out and uncomment retain if you want to
             #   retain the worker logs
-            auto_delete_objects = False,
+            auto_delete_objects = True,
             removal_policy = cdk.RemovalPolicy.DESTROY,
             # removal_policy = cdk.RemovalPolicy.RETAIN
         )
