@@ -24,7 +24,8 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
     && unzip awscliv2.zip \
     && sudo ./aws/install
 
-RUN mkdir -p "$AIRFLOW_HOME/.ssh"
+RUN mkdir /home/airflow/.ssh
+RUN chown -R airflow:root /home/airflow/.ssh
 RUN mkdir -p "$AIRFLOW_HOME/logs"
 RUN chown -R airflow:root ${AIRFLOW_HOME}
 

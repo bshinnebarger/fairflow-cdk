@@ -359,11 +359,11 @@ if [[ ${AIRFLOW_COMMAND} =~ ^(webserver)$ ]] ; then
 
     # If a private key is supplied, set that up
     if [[ ! -z ${GIT_READ_ONLY_SECRET_ARN} ]]; then
-        aws secretsmanager get-secret-value --secret-id $GIT_READ_ONLY_SECRET_ARN | jq -r .SecretString | tee ${AIRFLOW_HOME}/.ssh/id_rsa > /dev/null
-        chmod 400 ${AIRFLOW_HOME}/.ssh/id_rsa
+        aws secretsmanager get-secret-value --secret-id $GIT_READ_ONLY_SECRET_ARN | jq -r .SecretString | tee ~/.ssh/id_rsa > /dev/null
+        chmod 400 ~/.ssh/id_rsa
         eval "$(ssh-agent -s)"
-        ssh-add -k ${AIRFLOW_HOME}/.ssh/id_rsa
-        ssh-keyscan github.com > ${AIRFLOW_HOME}/.ssh/known_hosts
+        ssh-add -k ~/.ssh/id_rsa
+        ssh-keyscan github.com > ~/.ssh/known_hosts
     fi
 
     # Sync the repository to the shared EFS file systems
