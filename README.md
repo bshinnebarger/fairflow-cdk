@@ -112,7 +112,7 @@ _Change the commands to suit your OS, the following is written for `Ubuntu`_
 - `The first (and only) time you deploy` an AWS CDK app into an AWS envrionment _(account/region)_, you need to `bootstrap the CDK`.  This creates an S3 bucket where CDK will store some meta data.  This will use the default aws profile.  You can `append --profile` to override this, or you can [get more advanced](https://docs.aws.amazon.com/cdk/latest/guide/environments.html)
 
     ```bash
-    cdk bootstrap # --profile yourprofile
+    cdk bootstrap # --profile yourprofile (wait until you set up the manual secrets)
     cdk ls # show stacks in our app
     ```
 
@@ -120,7 +120,7 @@ _Change the commands to suit your OS, the following is written for `Ubuntu`_
 
     ```bash
     cdk synth # shows the cloudformation (CFN) yml our app generates
-    cdk deploy # deploys the app (creates CFN stack or modifies existing one)
+    cdk deploy # deploys the app (creates CFN stack or modifies existing one) (wait until you set up the manual secrets)
     cdk diff # shows what will change in our stack (run before you deploy for info)
     ```
 
