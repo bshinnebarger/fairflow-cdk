@@ -348,6 +348,15 @@ if [[ ${AIRFLOW_COMMAND} == "airflow" ]]; then
    shift
 fi
 
+# If a private key is supplied, set that up
+if [[ ! -z ${GIT_READ_ONLY_SECRET_ARN} ]]; then
+    aws secretsmanager get-secret-value --secret-id $GIT_READ_ONLY_SECRET_ARN | jq -r .SecretString | tee ~/.ssh/id_rsa > /dev/null
+    chmod 400 ~/.ssh/id_rsa
+    eval "$(ssh-agent -s)"
+    ssh-add -k ~/.ssh/id_rsa
+    ssh-keyscan github.com > ~/.ssh/known_hosts
+fi
+
 if [[ ${AIRFLOW_COMMAND} =~ ^(webserver)$ ]] ; then
     #   It's OK to run this multiple times
     #   See: https://airflow.apache.org/docs/apache-airflow/stable/production-deployment.html#database-backend
@@ -357,21 +366,14 @@ if [[ ${AIRFLOW_COMMAND} =~ ^(webserver)$ ]] ; then
     #   It's OK to run this more than once, it will just say "admin already created"
     create_www_user
 
-    # If a private key is supplied, set that up
-    if [[ ! -z ${GIT_READ_ONLY_SECRET_ARN} ]]; then
-        aws secretsmanager get-secret-value --secret-id $GIT_READ_ONLY_SECRET_ARN | jq -r .SecretString | tee ~/.ssh/id_rsa > /dev/null
-        chmod 400 ~/.ssh/id_rsa
-        eval "$(ssh-agent -s)"
-        ssh-add -k ~/.ssh/id_rsa
-        ssh-keyscan github.com > ~/.ssh/known_hosts
+    if [[ ! -z ${DAG_REPOSITORY} ]]; then
+        # Sync the repository to the shared EFS file systems
+        #   This is where the DAGs will live
+        echo -e "\n\nSyncing Repo"
+        source /sync_repo.sh
+        sync_repo
+        echo "Done in webserver"
     fi
-
-    # Sync the repository to the shared EFS file systems
-    #   This is where the DAGs will live
-    echo -e "\n\nSyncing Repo"
-    source /sync_repo.sh
-    sync_repo
-    echo "Done in webserver"
 fi
 
 # Note: the broker backend configuration concerns only a subset of Airflow components
