@@ -23,7 +23,8 @@ class RedisConstruct(cdk.Construct):
             self.redis_host = self.setup_fargate_redis_service(props)
             self.dynamic_dependency = self.redis_service
 
-        props.vpc_props.default_vpc_security_group.connections.allow_internally(
+        props.vpc_props.default_vpc_security_group.connections.allow_from(
+            other = props.vpc_props.default_vpc_security_group,
             port_range = ec2.Port.tcp(6379)
         )
 
@@ -88,12 +89,6 @@ class RedisConstruct(cdk.Construct):
             security_group = props.vpc_props.default_vpc_security_group,
             platform_version = ecs.FargatePlatformVersion.VERSION1_4,
             desired_count = 1
-        )
-
-        self.redis_service.connections.allow_from(
-            other = props.vpc_props.default_vpc_security_group,
-            port_range = ec2.Port.tcp(REDIS_CONFIG.container_port),
-            description = 'Redis Ingress'
         )
 
         # Add this service to a private dns namespace via Cloud Map
